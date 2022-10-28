@@ -26,7 +26,11 @@ fun HomeNavGraph(navController: NavHostController) {
             )
         }
         composable(route = BottomBarScreen.Patient.route) {
-            PatientListScreen()
+            PatientListScreen(
+                onSignUpClick = {
+                navController.popBackStack()
+                navController.navigate(Graph.HOME)
+            } )
         }
         composable(route = BottomBarScreen.Settings.route) {
             ScreenContent(
@@ -35,6 +39,7 @@ fun HomeNavGraph(navController: NavHostController) {
             )
         }
         detailsNavGraph(navController = navController)
+        patientReadingsNavGraph(navController = navController)
     }
 }
 
@@ -59,7 +64,37 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
     }
 }
 
+
+fun NavGraphBuilder.patientReadingsNavGraph(navController: NavHostController) {
+    navigation(
+        route = Graph.PATIENTREADINGS,
+        startDestination = PatientReadingScreen.Reading.route
+    ) {
+        composable(route = PatientReadingScreen.Reading.route) {
+            ScreenContent(name = PatientReadingScreen.Reading.route) {
+                navController.navigate(PatientReadingScreen.Overview.route)
+            }
+        }
+        composable(route = PatientReadingScreen.Overview.route) {
+            ScreenContent(name = PatientReadingScreen.Overview.route) {
+                navController.popBackStack(
+                    route = PatientReadingScreen.Reading.route,
+                    inclusive = false
+                )
+            }
+        }
+    }
+}
+
+
 sealed class DetailsScreen(val route: String) {
     object Information : DetailsScreen(route = "INFORMATION")
     object Overview : DetailsScreen(route = "OVERVIEW")
 }
+
+
+sealed class PatientReadingScreen(val route: String) {
+    object Reading : PatientReadingScreen(route = "PATIENTREADING")
+    object Overview : PatientReadingScreen(route = "OVERVIEW")
+}
+
