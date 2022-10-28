@@ -9,6 +9,7 @@ import androidx.navigation.navigation
 import my.bloo.hcwassistappcomposev2.BottomBarScreen
 import my.bloo.hcwassistappcomposev2.screens.ScreenContent
 import my.bloo.hcwassistappcomposev2.screens.PatientListScreen
+import my.bloo.hcwassistappcomposev2.screens.PatientForm01Screen
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
@@ -29,7 +30,7 @@ fun HomeNavGraph(navController: NavHostController) {
             PatientListScreen(
                 onSignUpClick = {
                 navController.popBackStack()
-                navController.navigate(Graph.HOME)
+                navController.navigate(Graph.PATIENTREADINGS)
             } )
         }
         composable(route = BottomBarScreen.Settings.route) {
@@ -71,7 +72,7 @@ fun NavGraphBuilder.patientReadingsNavGraph(navController: NavHostController) {
         startDestination = PatientReadingScreen.Reading.route
     ) {
         composable(route = PatientReadingScreen.Reading.route) {
-            ScreenContent(name = PatientReadingScreen.Reading.route) {
+            PatientForm01Screen() {
                 navController.navigate(PatientReadingScreen.Overview.route)
             }
         }
