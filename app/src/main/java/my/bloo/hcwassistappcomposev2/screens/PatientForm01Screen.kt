@@ -1,7 +1,10 @@
 package my.bloo.hcwassistappcomposev2.screens
 
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
@@ -33,13 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import my.bloo.hcwassistappcomposev2.BottomBarScreen
 import my.bloo.hcwassistappcomposev2.CustomItem
 import my.bloo.hcwassistappcomposev2.graphs.Graph
 import my.bloo.hcwassistappcomposev2.repository.PersonRepository
-
-//import my.bloomy.hcwassistappcompose.navigation.AUTH_GRAPH_ROUTE
-//import my.bloomy.hcwassistappcompose.navigation.Screen
+import my.bloo.hcwassistappcomposev2.model.FormState
 
 @Composable
 fun PatientForm01Screen(
@@ -48,45 +51,86 @@ fun PatientForm01Screen(
     val personRepository = PersonRepository()
     val getAllData = personRepository.getAllData()
 
+//    var state by remember mutableStateOf(FormState())
+//    val currentReadingScore: Int,
+//    val completedForm: Boolean
+
+
+    var stateOfForm: FormState by remember { mutableStateOf(FormState(0,false )) }
+
     LazyColumn(contentPadding = PaddingValues(10.dp)) {
 
         item {
-            Spo2()
+            Spo2(stateOfForm)
             BloodPressure()
-            HeartRate()
+            HeartRate(stateOfForm)
             RespiratoryRate()
             TemperatureRange()
             ConsciousLevel()
             OxygenDelivery()
             CapilaryRefillTime()
+            CurrentAssesment()
         }
     }
 }
 
-
 @Composable
-private fun HeartRate() {
+private fun Spo2(stateOfForm: FormState) {
     // Phone number textfield with max length as 10
 
-    var heartRateText by remember { mutableStateOf("") }
+    var spo2Text by remember { mutableStateOf("") }
     var showError: Boolean by remember { mutableStateOf(false) }
 
     val phoneNumber = remember { FocusRequester() }
+    var spo2Score by remember { mutableStateOf("3") }
 
-    OutlinedTextField(
-        value = heartRateText,
-        onValueChange = {
-            if (it.length <= 10) heartRateText = it
-        },
-        label = { Text("Enter heart rate") },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-        ),
-        isError = showError,
-        modifier = Modifier.focusRequester(phoneNumber)
+    var editable by remember { mutableStateOf(true) }
+//    AnimatedVisibility(visible = editable) {
+//        Text(text = "Edit")
+//    }
+
+    Row( verticalAlignment = Alignment.Top ) {
+        OutlinedTextField(
+            value = spo2Text,
+            onValueChange = {
+                if (it.length <= 10) spo2Text = it
+                stateOfForm.currentReadingScore = stateOfForm.currentReadingScore + 1
+
+//                evaluateSPO2(spo2Text)
+                Log.d("Spo2 : ", "${stateOfForm.currentReadingScore}")
+            },
+            label = { Text("Enter Spo2") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
+            ),
+            isError = showError,
+            modifier = Modifier.focusRequester(phoneNumber)
 //        keyboardActions = KeyboardActions(onNext = { password.requestFocus() })
-    )
+        )
+
+        BasicTextField(
+            value = spo2Score,
+            onValueChange = {
+                spo2Score = it
+            },
+            modifier = Modifier
+                .fillMaxWidth(.75f)
+                .height(50.dp)
+//                .background(Color.Black)
+//                .align(Alignment.CenterHorizontally)
+                .padding(start = 5.dp, top = 20.dp),
+//                .padding(15.dp),
+            textStyle = LocalTextStyle.current.copy(color = Color.Red),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+            ),
+//        keyboardActions = KeyboardActions(onNext = { simple.requestFocus() })
+        )
+    }
+
+
 }
+
 
 
 @Composable
@@ -114,22 +158,23 @@ private fun BloodPressure() {
 }
 
 
-
 @Composable
-private fun Spo2() {
+private fun HeartRate(stateOfForm: FormState) {
     // Phone number textfield with max length as 10
 
-    var spo2Text by remember { mutableStateOf("") }
+    var heartRateText by remember { mutableStateOf("") }
     var showError: Boolean by remember { mutableStateOf(false) }
 
     val phoneNumber = remember { FocusRequester() }
 
     OutlinedTextField(
-        value = spo2Text,
+        value = heartRateText,
         onValueChange = {
-            if (it.length <= 10) spo2Text = it
+            if (it.length <= 10) heartRateText = it
+            stateOfForm.currentReadingScore = stateOfForm.currentReadingScore + 1
+            Log.d("Spo2 : ", "${stateOfForm.currentReadingScore}")
         },
-        label = { Text("Enter Spo2") },
+        label = { Text("Enter heart rate") },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
         ),
@@ -138,6 +183,7 @@ private fun Spo2() {
 //        keyboardActions = KeyboardActions(onNext = { password.requestFocus() })
     )
 }
+
 
 
 @Composable
@@ -548,6 +594,32 @@ private fun TextFieldExamples() {
 
 }
 
+@Composable
+private fun CurrentAssesment(){
+
+    Row {
+        Button(
+            onClick = {
+//                showError = true
+            },
+            Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(5.dp)
+        ) {
+            Text(text = "Current Assesment: ")
+        }
+        Button(
+            onClick = {
+//                showError = false
+            },
+            Modifier
+                .wrapContentSize(Alignment.Center)
+                .padding(5.dp)
+        ) {
+            Text(text = " .... ")
+        }
+    }
+}
 
 class ColorsTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -571,9 +643,21 @@ class ColorsTransformation : VisualTransformation {
     }
 }
 
+private fun evaluateSPO2(spo2Text: String){
 
-
-
+    when(Integer.parseInt(spo2Text)){
+        2 ->  Log.d("Spo2 : ", "This is 2")
+        3,4,5,6,7,8 ->  Log.d("Spo2 : ", "When x is any number from 3,4,5,6,7,8")
+        in 9..15 -> Log.d("Spo2 : ", "When x is something from 9 to 1")
+        //if you want to perform some action
+        in 20..25 -> {
+//            val action = "Perform some action"
+            Log.d("Spo2 : ", "20-25")
+//            println(action)
+        }
+        else ->   Log.d("Spo2 : ", "else no")
+    }
+}
 
 
 @Composable

@@ -34,22 +34,28 @@ fun CustomItem(person: Person, onSignUpClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "${person.age}",
+            text = "Patient ID: ",
+            color = Color.Black,
+            fontSize = Typography.h5.fontSize,
+            fontWeight = FontWeight.Normal
+        )
+        Text(
+            text = "${person.id}",
             color = Color.Black,
             fontSize = Typography.h4.fontSize,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = person.firstName,
+            text = "Age: ",
             color = Color.Black,
             fontSize = Typography.h5.fontSize,
             fontWeight = FontWeight.Normal
         )
         Text(
-            text = person.lastName,
+            text = "${person.age}",
             color = Color.Black,
-            fontSize = Typography.h5.fontSize,
-            fontWeight = FontWeight.Normal
+            fontSize = Typography.h4.fontSize,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -63,6 +69,7 @@ fun CustomItemPreview() {
             id = 0,
             firstName = "John",
             lastName = "Doe",
+            dateOfBirth = "2020-01-01",
             age = 20
         ) , {}
     )
